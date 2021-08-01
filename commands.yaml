@@ -1,0 +1,19 @@
+version: 1.0
+repositories:
+  skeleton:
+    path: https://github.com/amine-khemissi/skeleton.git
+    version: main
+commands:
+  vendor:
+    actions:
+      - go vendor
+  test:
+    actions:
+      - go test ./...
+    befores:
+      - vendor
+  compile:
+    actions:
+      - go build -o  toto ./...
+    befores:
+      - test

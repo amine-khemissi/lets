@@ -1,0 +1,13 @@
+# Kubtan
+
+The goal of this tool is to ease working with multi repositories projects. The latter are well known because of the their hard maintenance and syncrhonisation.
+In order to manage that, I decided to create a tool that can from a single place act on a set of subdirectories.
+
+## Example
+
+Let's say we have 3 services:
+- A
+- B
+- C
+
+We want to compile all of them at once.
