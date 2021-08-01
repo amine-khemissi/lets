@@ -1,10 +1,11 @@
 package imple
 
 import (
-	"errors"
-	"fmt"
+	"github.com/amine-khemissi/lets/errors"
+	"github.com/amine-khemissi/lets/logger"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"strings"
 )
 
 type Kubtan struct {
@@ -16,7 +17,6 @@ func New(filePath string) (Kubtan, error) {
 	kubtan := Kubtan{}
 	yfile, err := ioutil.ReadFile(filePath)
 	if err != nil {
-
 		return kubtan, err
 	}
 	err2 := yaml.Unmarshal(yfile, &kubtan)
@@ -24,24 +24,27 @@ func New(filePath string) (Kubtan, error) {
 	if err2 != nil {
 		return kubtan, err2
 	}
-
 	if kubtan.detectLoop() {
 		return kubtan, errors.New("detected a loop")
 	}
-
 	return kubtan, nil
 }
 
-func (k Kubtan) Exec(cmdName string, only bool) error {
+func (k Kubtan) Exec(cmdName, target string, only bool) error {
 	cmd, found := k.Commands[cmdName]
 	if !found {
-		return errors.New(fmt.Sprintf("%s not found", cmdName))
+		return errors.New(cmdName, " not found")
 	}
 
-	if err := cmd.Exec(k.Commands, only); err != nil {
-		return errors.New(fmt.Sprintf("failed to execute %s, reason: %s", cmdName, err.Error()))
-	}
+	for repoName, _ := range k.Repositories {
+		if !strings.Contains(repoName, target) {
+			continue
+		}
 
+		if err := cmd.Exec(repoName, cmdName, k.Commands, only); err != nil {
+			return errors.Stack(err, "failed to execute", cmdName)
+		}
+	}
 	return nil
 }
 
@@ -52,7 +55,6 @@ func (k Kubtan) detectLoop() bool {
 		}
 	}
 	return false
-
 }
 
 func (k Kubtan) detectLoopForOneCommand(cmd string, v Command, commands map[string]Command, registeredCommands map[string]struct{}) bool {
@@ -72,12 +74,11 @@ func (k Kubtan) detectLoopForOneCommand(cmd string, v Command, commands map[stri
 }
 
 func (k Kubtan) Sync() error {
+	logger.Instance().Info("sync")
 	for name, repo := range k.Repositories {
-		fmt.Println("cd", name)
-		if err := repo.Sync(); err != nil {
-			return errors.New(fmt.Sprintf("failed to sync %s, reason: %s", name, err.Error()))
+		if err := repo.Sync(name); err != nil {
+			return errors.New(err, "failed to sync", name)
 		}
-		fmt.Println("cd ..")
 	}
 	return nil
 }

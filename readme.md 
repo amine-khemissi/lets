@@ -1,4 +1,4 @@
-# Kubtan
+# Lets
 
 The goal of this tool is to ease working with multi repositories projects. The latter are well known because of the their hard maintenance and syncrhonisation.
 In order to manage that, I decided to create a tool that can from a single place act on a set of subdirectories.
@@ -11,3 +11,16 @@ Let's say we have 3 services:
 - C
 
 We want to compile all of them at once.
+
+
+## Usage
+```
+Usage of ./lets:
+  -c string
+        Command to execute
+  -d    enable Debug mode
+  -f string
+        commands file path (default "lets.yaml")
+  -o    execute Only command without befores
+  -s    Sync with remote repositories
+```

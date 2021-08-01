@@ -1,4 +1,4 @@
-module github.com/amine-khemissi/kubtan
+module github.com/amine-khemissi/lets
 
 go 1.16
 
